@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-const BlogForm = ({ createBlog, setUserMessage, setErrorMessage }) => {
+const BlogForm = ({ createBlog, setUserMessage, setErrorMessage, blogs, setBlogs, handleNewBlog=null }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setURL] = useState('')
@@ -9,25 +9,28 @@ const BlogForm = ({ createBlog, setUserMessage, setErrorMessage }) => {
   const hideWhenVisible = { display: blogFormVisible ? 'none' : '' }
   const showWhenVisible = { display: blogFormVisible ? '' : 'none' }
 
-  const handleNewBlog = async (event) => {
-    event.preventDefault()
-    try {
-      const blog = await createBlog({
-        title, author, url
-      })
-      setAuthor('')
-      setTitle('')
-      setURL('')
-      setUserMessage(`A new blog ${blog.title} added`)
-      setTimeout(() => {
-        setUserMessage(null)
-      }, 5000)
-    } catch (exception) {
-      console.log('error: ', exception)
-      setErrorMessage('Incorrect blog form')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+  if (handleNewBlog === null){
+    handleNewBlog = async (event) => {
+      event.preventDefault()
+      try {
+        const blog = await createBlog({
+          title, author, url
+        })
+        setBlogs(blogs.concat(blog))
+        setAuthor('')
+        setTitle('')
+        setURL('')
+        setUserMessage(`A new blog ${blog.title} added`)
+        setTimeout(() => {
+          setUserMessage(null)
+        }, 5000)
+      } catch (exception) {
+        console.log('error: ', exception)
+        setErrorMessage('Incorrect blog form')
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      }
     }
   }
 
@@ -44,6 +47,7 @@ const BlogForm = ({ createBlog, setUserMessage, setErrorMessage }) => {
             <div>
                title:
               <input
+                id='title'
                 type="text"
                 value={title}
                 name="Title"
@@ -53,6 +57,7 @@ const BlogForm = ({ createBlog, setUserMessage, setErrorMessage }) => {
             <div>
                author:
               <input
+                id='author'
                 type="text"
                 value={author}
                 name="Author"
@@ -62,13 +67,14 @@ const BlogForm = ({ createBlog, setUserMessage, setErrorMessage }) => {
             <div>
                url:
               <input
+                id='url'
                 type="text"
                 value={url}
                 name="Url"
                 onChange={({ target }) => setURL(target.value)}
               />
             </div>
-            <button type="submit">create</button>
+            <button id='submitBlog' type="submit">create</button>
           </form>
         </div>
         <button onClick={() => setBlogFormVisible(false)}>cancel</button>

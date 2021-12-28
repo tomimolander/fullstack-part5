@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
-const Blog = ({ blog, blogs, setBlogs }) => {
+const Blog = ({ blog, blogs, setBlogs, handleBlogLike=null }) => {
   const [blogInfoVisible, setBlogInfoVisible] = useState(false)
   const hideWhenVisible = { display: blogInfoVisible ? 'none' : '' }
   const showWhenVisible = { display: blogInfoVisible ? '' : 'none' }
@@ -14,32 +14,33 @@ const Blog = ({ blog, blogs, setBlogs }) => {
     borderWidth: 1,
     marginBottom: 5
   }
+  if (handleBlogLike === null){
+    handleBlogLike = async (event) => {
+      event.preventDefault()
+      try {
+        const blogUpdate = {
+          user: blog.user.id,
+          likes: blog.likes+1,
+          author: blog.author,
+          title: blog.title,
+          url: blog.url
+        }
 
-  const handleBlogLike = async (event) => {
-    event.preventDefault()
-    try {
-      const blogUpdate = {
-        user: blog.user.id,
-        likes: blog.likes+1,
-        author: blog.author,
-        title: blog.title,
-        url: blog.url
-      }
-
-      blogService.update(blog.id, blogUpdate)
-        .then(returnedBlog => {
-          setBlogs(blogs.map(blogOld => blogOld.id !== blog.id ? blogOld : returnedBlog))
-        })
+        blogService.update(blog.id, blogUpdate)
+          .then(returnedBlog => {
+            setBlogs(blogs.map(blogOld => blogOld.id !== blog.id ? blogOld : returnedBlog))
+          })
       /*setUserMessage(`A new blog ${blog.title} added`)
       setTimeout(() => {
         setUserMessage(null)
       }, 5000)*/
-    } catch (exception) {
-      console.log('error: ', exception)
+      } catch (exception) {
+        console.log('error: ', exception)
       /*setErrorMessage('Incorrect blog form')
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)*/
+      }
     }
   }
 
@@ -70,14 +71,14 @@ const Blog = ({ blog, blogs, setBlogs }) => {
         {blog.title} {blog.author}
         <button onClick={() => setBlogInfoVisible(true)}>view</button>
       </div>
-      <div style={showWhenVisible}>
+      <div style={showWhenVisible} className="togglableContent">
         <button onClick={() => setBlogInfoVisible(false)}>hide</button>
         <p>{blog.title}</p>
         <p>{blog.url}</p>
         <p>likes: {blog.likes}</p>
-        <button onClick={handleBlogLike}>like</button>
+        <button id='likeButton' onClick={handleBlogLike}>like</button>
         <p>{blog.author}</p>
-        <button onClick={handleBlogRemove}>remove</button>
+        <button id='removeButton' onClick={handleBlogRemove}>remove</button>
       </div>
     </div>
   )}
